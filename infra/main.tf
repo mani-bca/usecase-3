@@ -181,7 +181,7 @@ module "alb" {
   }
   
   # Default target group for root path (/)
-#  default_target_group_key = "devlake"
+ default_target_group_key = "devlake"
   
   # Target Group Attachments
   target_group_attachments = [
