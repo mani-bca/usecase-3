@@ -188,11 +188,6 @@ module "alb" {
   ]
   # Path-based routing rules
   path_based_rules = {
-    # devlake = {
-    #   priority      = 10
-    #   path_patterns = ["/"]
-    #   target_group_key = "devlake"
-    # },
     openproject = {
       priority      = 20
       path_patterns = ["/"]
