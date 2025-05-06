@@ -146,7 +146,7 @@ module "alb" {
       port     = 80
       protocol = "HTTP"
       health_check = {
-        path                = "/devlake"
+        path                = "/"
         port                = "traffic-port"
         healthy_threshold   = 3
         unhealthy_threshold = 3
@@ -172,7 +172,7 @@ module "alb" {
       port     = 80
       protocol = "HTTP"
       health_check = {
-        path                = "/openproject"
+        path                = "/"
         port                = "traffic-port"
         healthy_threshold   = 3
         unhealthy_threshold = 3
@@ -208,12 +208,12 @@ module "alb" {
   path_based_rules = {
     devlake = {
       priority      = 10
-      path_patterns = ["/devlake*"]
+      path_patterns = ["/"]
       target_group_key = "devlake"
     },
     openproject = {
       priority      = 20
-      path_patterns = ["/openproject*"]
+      path_patterns = ["/"]
       target_group_key = "openproject"
     }
   }
