@@ -1,44 +1,21 @@
 #!/bin/bash
-
-# Update system packages
-echo "Updating system packages..."
 apt-get update -y
-apt-get upgrade -y
-
-# Install required dependencies
-echo "Installing dependencies..."
-apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-
-# Install Docker
-echo "Installing Docker..."
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-apt-get update -y
-apt-get install -y docker-ce docker-ce-cli containerd.io
-
-# Install Docker Compose
-echo "Installing Docker Compose..."
-curl -L "https://github.com/docker/compose/releases/download/v2.18.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
-
-# Start Docker service
-echo "Starting Docker service..."
+apt-get install -y docker.io
 systemctl start docker
 systemctl enable docker
+sudo docker network create devlake-network
 
-# Create directory for DevLake
-echo "Setting up DevLake..."
-mkdir -p /opt/devlake
-cd /opt/devlake
+sudo docker run -d --name devlake-mysql \
+  --network devlake-network \
+  -e MYSQL_ROOT_PASSWORD=admin \
+  -e MYSQL_DATABASE=lake \
+  -e MYSQL_USER=merico \
+  -e MYSQL_PASSWORD=merico \
+  -p 3306:3306 \
+  mysql:8
 
-# Download DevLake docker-compose file
-curl -LO https://raw.githubusercontent.com/apache/incubator-devlake/main/docker-compose.yml
+sudo docker run -d --name devlake --network devlake-network -e "DB_URL=mysql://merico:merico@devlake-mysql:3306/lake?charset=utf8mb4&parseTime=True" -e "ENCRYPTION_SECRET=merico1234abcd" -p 8080:8080 apache/devlake:latest
 
-# Modify the configuration to expose port 8080
-sed -i 's/8080:8080/8080:8080/g' docker-compose.yml
+sudo docker run -d --name config-ui --network devlake-network -e DEVLAKE_ENDPOINT=http://devlake:8080 -p 4000:4000 apache/devlake-config-ui:latest
 
-# Start DevLake
-echo "Starting DevLake services..."
-docker-compose up -d
-
-echo "Installation complete. DevLake should be available on port 8080."
+sudo docker run -d --name grafana --network devlake-network -e GF_SECURITY_ADMIN_USER=admin -e GF_SECURITY_ADMIN_PASSWORD=admin -p 3000:3000 apache/devlake-dashboard:latest
