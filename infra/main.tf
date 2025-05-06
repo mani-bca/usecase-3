@@ -143,7 +143,7 @@ module "alb" {
   # Target Groups
   target_groups = {
     devlake = {
-      port     = 4000
+      port     = 8080
       protocol = "HTTP"
       health_check = {
         path                = "/"
@@ -178,7 +178,7 @@ module "alb" {
     {
       target_group_key = "devlake"
       target_id        = module.web_server_2.instance_id
-      port             = 4000
+      port             = 8080
     },
     {
       target_group_key = "openproject"
@@ -188,17 +188,36 @@ module "alb" {
   ]
   # Path-based routing rules
   path_based_rules = {
-    devlake = {
-      priority      = 10
-      path_patterns = ["/"]
-      target_group_key = "devlake"
-    },
+    # devlake = {
+    #   priority      = 10
+    #   path_patterns = ["/"]
+    #   target_group_key = "devlake"
+    # },
     openproject = {
       priority      = 20
       path_patterns = ["/"]
       target_group_key = "openproject"
     }
   }
+  # New additional listeners
+  additional_listeners = {
+    custom_8080 = {
+      port            = 8080
+      protocol        = "HTTP"
+      target_group_key = "devlake" 
+    }
+  }
+
+  # Rules for additional listeners
+  additional_listener_rules = {
+    custom_8080_rule = {
+      listener_key     = "custom_8080"
+      priority         = 10
+      path_patterns    = ["/"]
+      target_group_key = "devlake"
+    }
+  }
+
   
   tags = {
     Environment = var.environment
