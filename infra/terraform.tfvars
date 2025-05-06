@@ -16,7 +16,7 @@ private_subnet_cidrs = []
 create_nat_gateway   = false
 
 # EC2 settings
-web_server_ami           = "ami-0e35ddab05955cf57"
+web_server_ami           = "ami-084568db4383264d4"
 web_server_instance_type = "t2.medium"
 ssh_key_name             = "devops"
 root_volume_type         = "gp2"
