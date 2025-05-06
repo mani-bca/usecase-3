@@ -155,19 +155,6 @@ module "alb" {
         matcher             = "200"
       }
     },
-#    openproject = {
-#      port     = 80
-#      protocol = "HTTP"
-#      health_check = {
-#        path                = "/openproject"
-#        port                = "traffic-port"
-#        healthy_threshold   = 3
-#        unhealthy_threshold = 3
-#        timeout             = 5
-#        interval            = 30
-#        matcher             = "200"
-#      }
-#    },
     openproject = {
       port     = 80
       protocol = "HTTP"
@@ -193,11 +180,6 @@ module "alb" {
       target_id        = module.web_server_2.instance_id
       port             = 4000
     },
-#    {
-#      target_group_key = "testgroup"
-#      target_id        = module.web_server.instance_id
-#      port             = 80
-#    },
     {
       target_group_key = "openproject"
       target_id        = module.web_server_1.instance_id
