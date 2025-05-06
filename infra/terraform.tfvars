@@ -19,7 +19,35 @@ create_nat_gateway   = false
 web_server_ami           = "ami-0e35ddab05955cf57"
 web_server_instance_type = "t2.micro"
 ssh_key_name             = "devops"
-admin_ip_cidr            = "0.0.0.0/0"
 root_volume_type         = "gp2"
 root_volume_size         = 8
 iam_instance_profile     = null
+# admin_ip_cidr            = "0.0.0.0/0"
+
+# sg for ALB
+alb_sg_ingress_cidr = [
+  {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTP from anywhere"
+  },
+  {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTPS from anywhere"
+  }
+]
+
+alb_sg_egress_rules = [
+  {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound traffic"
+  }
+]

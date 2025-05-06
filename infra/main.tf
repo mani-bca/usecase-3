@@ -60,6 +60,54 @@ module "web_server_sg" {
     module.alb_sg
   ]
 }
+
+# Security Group for EC2 Instances
+module "web_server_sg" {
+  source = "git::https://github.com/mani-bca/set-aws-infra.git//modules/security_group?ref=main"
+  
+  name_prefix  = "${var.project_name}-${var.environment}"
+  name         = "ec2-sg"
+  description  = "Security group for EC2 instances"
+  vpc_id       = module.vpc.vpc_id
+  
+  ingress_with_source_security_group_id = [
+    {
+      from_port               = 80
+      to_port                 = 80
+      protocol                = "tcp"
+      source_security_group_id = module.alb_sg.security_group_id
+      description             = "Allow HTTP from ALB"
+    }
+  ]
+  
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = var.ssh_allowed_cidrs
+      description = "Allow SSH from specified CIDRs"
+    }
+  ]
+  egress_rules = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+      description = "Allow all outbound traffic"
+    }
+  ]
+  tags = {
+    Environment = var.environment
+    Project     = var.project_name
+  }
+  depends_on = [
+    module.vpc,
+    module.alb_sg
+  ]
+}
+
 # Security Group for ALB
 module "alb_sg" {
   source = "git::https://github.com/mani-bca/set-aws-infra.git//modules/security_group?ref=main"

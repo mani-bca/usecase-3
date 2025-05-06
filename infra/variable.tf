@@ -62,10 +62,10 @@ variable "ssh_key_name" {
   type        = string
 }
 
-variable "admin_ip_cidr" {
-  description = "CIDR block for admin IP (for SSH access)"
-  type        = string
-}
+# variable "admin_ip_cidr" {
+#   description = "CIDR block for admin IP (for SSH access)"
+#   type        = string
+# }
 
 variable "root_volume_type" {
   description = "Volume type for the root block device"
@@ -104,4 +104,9 @@ variable "alb_sg_egress_rules" {
     description = string
   }))
   default = []
+}
+variable "ssh_allowed_cidrs" {
+  description = "CIDR blocks allowed to SSH to instances"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
 }
