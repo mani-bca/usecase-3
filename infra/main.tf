@@ -103,7 +103,8 @@ module "web_server_1" {
   tags = var.tags
   depends_on = [
     module.vpc,
-    module.alb_sg
+    module.alb_sg,
+    module.web_server_sg
   ]
 }
 
@@ -126,7 +127,8 @@ module "web_server_2" {
   tags = var.tags
   depends_on = [
     module.vpc,
-    module.alb_sg
+    module.alb_sg,
+    module.web_server_sg
   ]
 }
 
@@ -212,7 +214,7 @@ module "alb" {
     openproject = {
       priority      = 20
       path_patterns = ["/openproject*"]
-      target_group_key = "register"
+      target_group_key = "openproject"
     }
   }
   
@@ -223,6 +225,7 @@ module "alb" {
   depends_on = [
     module.vpc,
     module.alb_sg,
+    module.web_server_sg,
     module.web_server_1,
     module.web_server_2
   ]
