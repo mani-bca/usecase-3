@@ -143,7 +143,7 @@ module "alb" {
   # Target Groups
   target_groups = {
     devlake = {
-      port     = 80
+      port     = 4000
       protocol = "HTTP"
       health_check = {
         path                = "/"
@@ -184,14 +184,14 @@ module "alb" {
   }
   
   # Default target group for root path (/)
- default_target_group_key = "devlake"
+  default_target_group_key = "openproject"
   
   # Target Group Attachments
   target_group_attachments = [
     {
       target_group_key = "devlake"
       target_id        = module.web_server_2.instance_id
-      port             = 80
+      port             = 4000
     },
 #    {
 #      target_group_key = "testgroup"
