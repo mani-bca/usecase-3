@@ -118,7 +118,7 @@ module "web_server_2" {
   security_group_ids         = [module.web_server_sg.security_group_id]
   key_name                   = var.ssh_key_name
   associate_public_ip_address = true
-  user_data_script          = "${path.root}/scripts/shell.sh"
+  user_data_script          = "${path.root}/scripts/dev.sh"
   
   root_volume_type           = var.root_volume_type
   root_volume_size           = var.root_volume_size
@@ -190,7 +190,7 @@ module "alb" {
   target_group_attachments = [
     {
       target_group_key = "devlake"
-      target_id        = module.web_server_1.instance_id
+      target_id        = module.web_server_2.instance_id
       port             = 80
     },
 #    {
