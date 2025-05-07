@@ -142,19 +142,6 @@ module "alb" {
   
   # Target Groups
   target_groups = {
-    devlake = {
-      port     = 8080
-      protocol = "HTTP"
-      health_check = {
-        path                = "/"
-        port                = "traffic-port"
-        healthy_threshold   = 3
-        unhealthy_threshold = 3
-        timeout             = 5
-        interval            = 30
-        matcher             = "200"
-      }
-    },
     openproject = {
       port     = 80
       protocol = "HTTP"
@@ -169,17 +156,11 @@ module "alb" {
       }
     }
   }
-  
-  # Default target group for root path (/)
+   
   default_target_group_key = "openproject"
   
   # Target Group Attachments
   target_group_attachments = [
-    {
-      target_group_key = "devlake"
-      target_id        = module.web_server_2.instance_id
-      port             = 8080
-    },
     {
       target_group_key = "openproject"
       target_id        = module.web_server_1.instance_id
@@ -194,26 +175,6 @@ module "alb" {
       target_group_key = "openproject"
     }
   }
-  # New additional listeners
-  additional_listeners = {
-    custom_8080 = {
-      port            = 8080
-      protocol        = "HTTP"
-      target_group_key = "devlake" 
-    }
-  }
-
-  # Rules for additional listeners
-  additional_listener_rules = {
-    custom_8080_rule = {
-      listener_key     = "custom_8080"
-      priority         = 10
-      path_patterns    = ["/"]
-      target_group_key = "devlake"
-    }
-  }
-
-  
   tags = {
     Environment = var.environment
     Project     = var.project_name
@@ -225,5 +186,60 @@ module "alb" {
     module.web_server_1,
     module.web_server_2
   ]
+}
 
+module "alb2" {
+  source = "git::https://github.com/mani-bca/set-aws-infra.git//modules/alb?ref=main"
+  
+  name_prefix = "${var.project_name}-${var.environment}-sec"
+  vpc_id      = module.vpc.vpc_id
+  subnet_ids  = module.vpc.public_subnet_ids
+  security_group_ids = [module.alb_sg.security_group_id]
+  
+  # Target Groups
+  target_groups = {
+    devlake = {
+      port     = 4000
+      protocol = "HTTP"
+      health_check = {
+        path                = "/"
+        port                = "traffic-port"
+        healthy_threshold   = 3
+        unhealthy_threshold = 3
+        timeout             = 5
+        interval            = 30
+        matcher             = "200"
+      }
+    }
+  }
+   
+  default_target_group_key = "devlake"
+  
+  # Target Group Attachments
+  target_group_attachments = [
+    {
+      target_group_key = "devlake"
+      target_id        = module.web_server_1.instance_id
+      port             = 4000
+    }
+  ]
+  # Path-based routing rules
+  path_based_rules = {
+    devlake = {
+      priority      = 20
+      path_patterns = ["/"]
+      target_group_key = "devlake"
+    }
+  }
+  tags = {
+    Environment = var.environment
+    Project     = var.project_name
+  }
+  depends_on = [
+    module.vpc,
+    module.alb_sg,
+    module.web_server_sg,
+    module.web_server_1,
+    module.web_server_2
+  ]
 }
