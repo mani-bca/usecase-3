@@ -30,6 +30,13 @@ module "web_server_sg" {
       protocol                = "tcp"
       source_security_group_id = module.alb_sg.security_group_id
       description             = "Allow HTTP from ALB"
+    },
+    {
+      from_port               = 4000
+      to_port                 = 4000
+      protocol                = "tcp"
+      source_security_group_id = module.alb_sg.security_group_id
+      description             = "Allow HTTP from ALB dev"
     }
   ]
   
@@ -219,7 +226,7 @@ module "alb2" {
   target_group_attachments = [
     {
       target_group_key = "devlake"
-      target_id        = module.web_server_1.instance_id
+      target_id        = module.web_server_2.instance_id
       port             = 4000
     }
   ]

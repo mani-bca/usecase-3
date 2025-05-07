@@ -34,6 +34,13 @@ alb_sg_ingress_cidr = [
     description = "Allow HTTP from anywhere"
   },
   {
+    from_port   = 4000
+    to_port     = 4000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTP from anywhere"
+  },
+  {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
