@@ -2,66 +2,8 @@
 apt-get update -y
 apt-get install -y docker.io
 systemctl start docker
-systemctl enable docker
-
-# DOCKER_COMPOSE_VERSION="1.29.2"
-# sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-# sudo chmod +x /usr/local/bin/docker-compose
-
+git clone https://github.com/mani-bca/usecase-3.git
+cd usecase-3/infra/docker
 curl -SL https://github.com/docker/compose/releases/download/v2.33.1/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
-
-# Create Docker Compose file
-cat <<EOF > docker-compose.yml
-version: '3.9'
-
-services:
-  mysql:
-    image: mysql:8
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: lake
-      MYSQL_USER: merico
-      MYSQL_PASSWORD: merico
-    volumes:
-      - mysql-data:/var/lib/mysql
-    ports:
-      - "3306:3306"
-
-  lake:
-    image: mericodev/devlake:latest
-    depends_on:
-      - mysql
-    ports:
-      - "8080:8080"
-
-  config-ui:
-    image: mericodev/devlake-config-ui:latest
-    depends_on:
-      - lake
-    ports:
-      - "4000:4000"
-
-  grafana:
-    image: mericodev/devlake-dashboard:latest
-    ports:
-      - "3002:3000"
-    volumes:
-      - grafana-storage:/var/lib/grafana
-    environment:
-      GF_SERVER_ROOT_URL: "http://0.0.0.0:4000/grafana"
-      GF_USERS_DEFAULT_THEME: "light"
-      MYSQL_URL: mysql:3306
-      MYSQL_DATABASE: lake
-      MYSQL_USER: merico
-      MYSQL_PASSWORD: merico
-    depends_on:
-      - mysql
-
-volumes:
-  mysql-data:
-  grafana-storage:
-EOF
-
-# Run Docker Compose
-sudo docker-compose up -d
+docker-compose up -d
